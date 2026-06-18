@@ -16,7 +16,7 @@ class TokenService {
         const token = Token.create({user:userId,refreshToken});
         return token;
     }
-    gtToken(refreshToken){
+    getToken(refreshToken){
         return Token.findByIdAndUpdate({refreshToken});
     }
     removeToken(refreshToken){

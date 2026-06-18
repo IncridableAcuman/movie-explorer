@@ -13,8 +13,8 @@ class BaseErrors extends Error {
     static NotFound(message,errors=[]){
         return new BaseErrors(404,message,errors);
     }
-    static Unauthorized(message,errors=[]){
-        return new BaseErrors(401,message,errors)
+    static Unauthorized(){
+        return new BaseErrors("Bad authorization")
     }
 }
 module.exports = BaseErrors;
