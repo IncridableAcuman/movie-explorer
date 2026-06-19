@@ -8,5 +8,7 @@ const router = Router();
 
 router.post("/register",validationRequest(registerSchema),authController.register);
 router.post("/login",validationRequest(loginShema),authController.login);
+router.get("/refresh",authController.refresh);
+router.post("/logout",authController.logout);
 
 module.exports = router;

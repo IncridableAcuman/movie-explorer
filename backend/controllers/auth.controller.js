@@ -4,9 +4,23 @@ class AuthController {
     async register(req, res, next) {
         try {
             const { username, email, password } = req.body;
-            const user = await authService.refresh(username, email, password);
-            res.cookie("refreshToken", user.refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 })
-            return res.status(200).json({ message: "success", user });
+
+            const user = await authService.register(
+                username,
+                email,
+                password
+            );
+
+            res.cookie("refreshToken", user.refreshToken, {
+                httpOnly: true,
+                maxAge: 7 * 24 * 60 * 60 * 1000
+            });
+
+            return res.status(201).json({
+                success: true,
+                user
+            });
+
         } catch (error) {
             next(error);
         }
@@ -25,7 +39,7 @@ class AuthController {
         try {
             const { refreshToken } = req.cookies;
             const user = await authService.refresh(refreshToken);
-            res.cookie("refreshToken", user.refreshToken, { httpONly: true, maxAge: 604800000 });
+            res.cookie("refreshToken", user.refreshToken, { httpOnly: true, maxAge: 604800000 });
             return res.status(200).json({ message: "success", user });
         } catch (error) {
             next(error);

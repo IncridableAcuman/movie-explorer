@@ -17,7 +17,7 @@ class TokenService {
         return token;
     }
     getToken(refreshToken){
-        return Token.findByIdAndUpdate({refreshToken});
+        return Token.findOne({refreshToken});
     }
     removeToken(refreshToken){
         return Token.findOneAndDelete({refreshToken});

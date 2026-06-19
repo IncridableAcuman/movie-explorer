@@ -5,17 +5,19 @@ const db = require("./config/db.config");
 const errorMiddleware = require("./middlewares/error.middleware");
 const cookieParser = require('cookie-parser');
 const authRoute = require("./routes/auth.route");
+const movieRoute = require("./routes/movie.route");
 
 const app = express();
 
 app.use(express.json());
 app.use(cors({
     credentials: true,
-    origin: "http://localhost:5173"
+    origin: process.env.CLIENT_URL
 }));
 app.use(cookieParser({}));
 
-app.use("/api/v1/auth",authRoute);
+app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/movies", movieRoute);
 
 app.use(errorMiddleware)
 

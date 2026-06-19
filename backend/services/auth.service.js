@@ -9,7 +9,7 @@ class AuthService {
     async register(username, email, password) {
         const existUser = await User.findOne({ email });
         if (existUser) {
-            throw new BaseError.BadRequest("User already exist");
+            throw BaseError.BadRequest("User already exist");
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({ username, email, password: hashedPassword });
@@ -21,11 +21,11 @@ class AuthService {
     async login(email, password) {
         const user = await User.findOne({ email });
         if (!user) {
-            throw new BaseError.NotFound("User not found");
+            throw BaseError.NotFound("User not found");
         }
         const matchesPassword = await bcrypt.compare(password, user.password);
         if (!matchesPassword) {
-            throw new BaseError.BadRequest("Password doesn't match");
+            throw BaseError.BadRequest("Password doesn't match");
         }
         const dto = new UserResponse(user);
         const tokens = tokenService.generateTokens({ ...dto });
@@ -36,11 +36,11 @@ class AuthService {
         const payload = tokenService.validateRefreshToken(refreshToken);
         const tokenDb = await tokenService.getToken(refreshToken);
         if (!payload || !tokenDb) {
-            throw new BaseError.Unauthorized();
+            throw BaseError.Unauthorized();
         }
         const user = await User.findById(payload.id);
         if (!user) {
-            throw new BaseError.Unauthorized();
+            throw BaseError.Unauthorized();
         }
         const dto = new UserResponse(user);
         const tokens = tokenService.generateTokens({ ...dto });
