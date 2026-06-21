@@ -13,7 +13,8 @@ class AuthController {
 
             res.cookie("refreshToken", user.refreshToken, {
                 httpOnly: true,
-                maxAge: 7 * 24 * 60 * 60 * 1000
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+                sameSite: "lax"
             });
 
             return res.status(201).json({
@@ -29,7 +30,7 @@ class AuthController {
         try {
             const { email, password } = req.body;
             const user = await authService.login(email, password);
-            res.cookie("refreshToken", user.refreshToken, { httpOnly: true, maxAge: 604800000 })
+            res.cookie("refreshToken", user.refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000,sameSite: "lax" })
             return res.status(200).json({ message: "success", user });
         } catch (error) {
             next(error);
@@ -39,7 +40,7 @@ class AuthController {
         try {
             const { refreshToken } = req.cookies;
             const user = await authService.refresh(refreshToken);
-            res.cookie("refreshToken", user.refreshToken, { httpOnly: true, maxAge: 604800000 });
+            res.cookie("refreshToken", user.refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000,sameSite: "lax" });
             return res.status(200).json({ message: "success", user });
         } catch (error) {
             next(error);

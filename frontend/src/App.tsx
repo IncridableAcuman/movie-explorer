@@ -2,13 +2,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Layout } from './components/Layout';
 import { Toaster } from 'react-hot-toast';
 import { Home } from './pages/Home';
-import { MovieDetails } from './pages/MovieDetails';
 import { Favorites } from './pages/Favorites';
 import { useAuthStore } from './store/useAuthStore';
 import { useEffect, type JSX } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { MovieDetailsPage } from './pages/MovieDetails';
 
 // Himoyalangan yo'llar komponenti
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -48,7 +48,7 @@ function App() {
 
           {/* Himoyalangan platforma yo'llari */}
           <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/movie/:id" element={<ProtectedRoute><MovieDetails /></ProtectedRoute>} />
+          <Route path="/movie/:id" element={<ProtectedRoute><MovieDetailsPage /></ProtectedRoute>} />
           <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
         </Routes>
       </Layout>
