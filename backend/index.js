@@ -12,8 +12,11 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-    credentials: true,
-    origin: "https://izzatbek-movie-explorer.onrender.com"
+    origin: [
+        "http://localhost:5173",
+        "https://izzatbek-movie-explorer.onrender.com"
+    ],
+    credentials: true
 }));
 app.use(cookieParser({}));
 
