@@ -1,24 +1,34 @@
-import { api } from '../api/api';
+import axiosInstance from '../api/api';
 import type { Movie, MovieDetails } from '../types';
 
 export const MovieService = {
-  // 1. Trending filmlarni olish
-  getTrending: async (): Promise<Movie[]> => {
-    const { data } = await api.get('/trending/movie/day');
-    return data.results;
+  // 1. Backenddan toifalar bo'yicha kinolarni olish (Masalan: popular, trending, top_rated)
+  // Oldingi getTrending o'rniga backenddagi /categories endpointidan foydalanamiz
+  getTrending: async (category: string = 'popular'): Promise<Movie[]> => {
+    const { data } = await axiosInstance.get('/movies/categories', {
+      params: { category }
+    });
+    // Backendingiz "movies" kaliti ichida ma'lumot qaytaradi
+    return data.movies;
   },
 
-  // 2. Kino qidirish
+  // 2. Backend orqali qidiruv tizimi
   searchMovies: async (query: string): Promise<Movie[]> => {
-    const { data } = await api.get('/search/movie', {
+    const { data } = await axiosInstance.get('/movies/search', {
       params: { query },
     });
-    return data.results;
+    return data.movies;
   },
 
   // 3. Film tafsilotlarini olish
   getDetails: async (id: string | number): Promise<MovieDetails> => {
-    const { data } = await api.get(`/movie/${id}`);
-    return data;
+    const { data } = await axiosInstance.get(`/movies/details/${id}`);
+    return data.movies;
   },
+
+  // 4. Filmning treyleri yoki videosini olish (Backendda borligi uchun qo'shib qo'ydik)
+  getVideo: async (id: string | number): Promise<any> => {
+    const { data } = await axiosInstance.get(`/movies/video/${id}`);
+    return data.movies;
+  }
 };

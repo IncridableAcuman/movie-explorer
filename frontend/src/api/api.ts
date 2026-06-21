@@ -1,24 +1,49 @@
-import axios from 'axios';
+import axios, { type AxiosInstance, AxiosError, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 
-// Agar TMDB ishlatilsa, VITE_API_URL va VITE_API_TOKEN .env faylda bo'ladi
-const API_URL = import.meta.env.VITE_API_URL || 'https://api.themoviedb.org/3';
-const API_TOKEN = import.meta.env.VITE_API_TOKEN || '';
-
-export const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${API_TOKEN}`,
-  },
-  withCredentials: true, // Backend kuki (session/refresh token) bilan ishlashi uchun
+const axiosInstance: AxiosInstance = axios.create({
+  withCredentials: true,
+  baseURL: "http://localhost:8080/api/v1",
+  timeout: 10000,
 });
 
-// So'rovlarni tutish (Interceptors) - xatoliklar bilan ishlash uchun
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const message = error.response?.data?.status_message || 'Xatolik yuz berdi';
-    console.error('API Error:', message);
-    return Promise.reject(error);
-  }
+axiosInstance.interceptors.request.use(
+    (config: InternalAxiosRequestConfig) => {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error: AxiosError) => Promise.reject(error)
 );
+
+axiosInstance.interceptors.response.use(
+    (response: AxiosResponse) => response,
+    async (error: AxiosError) => {
+      const originalRequest = error.config as InternalAxiosRequestConfig & {
+        _retry: boolean
+      }
+      if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+        originalRequest._retry = true;
+        // Agar xato refresh so'rovining o'zidan qaytsa, cheksiz siklga kirmaslik uchun darhol to'xtatamiz
+        if (originalRequest.url?.includes('/auth/refresh')) {
+          localStorage.removeItem("accessToken");
+          return Promise.reject(error);
+        }
+        try {
+          const { data } = await axiosInstance.get("/auth/refresh", { withCredentials: true });
+          localStorage.setItem("accessToken", data.accessToken);
+          originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+          return axiosInstance(originalRequest);
+        } catch (error) {
+          console.log(error);
+          localStorage.removeItem("accessToken");
+          window.location.href = "/login";
+          return Promise.reject(error)
+        }
+      }
+      return Promise.reject(error)
+    }
+);
+
+export default axiosInstance;
