@@ -12,30 +12,31 @@ export const Home = () => {
   const [loading, setLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
+  // Foydalanuvchi yozishdan to'xtagandan 600ms o'tib qidiruv ishga tushadi (Debounce)
   const debouncedSearch = useDebounce(searchQuery, 600);
 
-
-
   useEffect(() => {
-      // Kinolarni yuklash funksiyasi
-  const fetchMovies = async () => {
-    setLoading(true);
-    try {
-      if (debouncedSearch.trim()) {
-        setIsSearching(true);
-        const results = await MovieService.searchMovies(debouncedSearch);
-        setMovies(results || []);
-      } else {
-        setIsSearching(false);
-        const trending = await MovieService.getTrending();
-        setMovies(trending || []);
+    const fetchMovies = async () => {
+      setLoading(true);
+      try {
+        if (debouncedSearch.trim()) {
+          setIsSearching(true);
+          const results = await MovieService.searchMovies(debouncedSearch);
+          setMovies(results || []);
+        } else {
+          setIsSearching(false);
+          // DIQQAT: MovieService.getTrending endi backend talabi bo'yicha kategoriya so'raydi
+          const trending = await MovieService.getTrending('popular'); 
+          setMovies(trending || []);
+        }
+      } catch (error) {
+        console.error("Kinolarni yuklashda xatolik:", error);
+        setMovies([]); // Xatolik bo'lsa, xarita (map) render bo'lishida xato bermasligi uchun bo'sh massiv
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Kinolarni yuklashda xatolik:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
     fetchMovies();
   }, [debouncedSearch]);
 
@@ -46,7 +47,7 @@ export const Home = () => {
         <motion.h1 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-4xl md:text-5xl font-extrabold tracking-tight bg-linear-to-r from-white via-gray-300 to-muted bg-clip-text text-transparent"
+          className="text-4xl md:text-5xl font-extrabold tracking-tight bg-linear-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent"
         >
           Cheksiz Kinolar Dunyosiga Sho'ng'ing
         </motion.h1>
@@ -54,7 +55,7 @@ export const Home = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-muted text-sm md:text-base"
+          className="text-gray-4xl text-sm md:text-base text-gray-4xl/70"
         >
           Millionlab filmlar, sarguzashtlar va tahlillar. O'z sevimli filmingizni hoziroq toping.
         </motion.p>
@@ -66,13 +67,13 @@ export const Home = () => {
           transition={{ delay: 0.3 }}
           className="relative max-w-xl mx-auto group"
         >
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-primary transition-colors" size={20} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-4xl group-focus-within:text-primary transition-colors" size={20} />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Kino nomini yozing..."
-            className="w-full bg-surface/80 border border-gray-800 focus:border-primary rounded-full pl-12 pr-6 py-3.5 text-sm text-white placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/20 backdrop-blur-sm transition-all"
+            className="w-full bg-slate-900/80 border border-gray-800 focus:border-primary rounded-full pl-12 pr-6 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/20 backdrop-blur-sm transition-all"
           />
         </motion.div>
       </div>
@@ -82,13 +83,14 @@ export const Home = () => {
         <div className="flex items-center gap-2 border-b border-gray-800/60 pb-3">
           <Film size={20} className="text-primary" />
           <h2 className="text-xl font-bold tracking-wide">
-            {isSearching ? `"${searchQuery}" bo'yicha natijalar` : 'Bugungi Trending Filmlar'}
+            {/* Bu yerda searchQuery emas debouncedSearch ishlatilgani ma'qul */}
+            {isSearching ? `"${debouncedSearch}" bo'yicha natijalar` : 'Bugungi Trending Filmlar'}
           </h2>
         </div>
 
         {/* Loading va Grid qismi */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted">
+          <div className="flex flex-col items-center justify-center py-20 gap-3 text-gray-4xl">
             <Loader2 className="animate-spin text-primary" size={36} />
             <span className="text-sm">Filmlar yuklanmoqda...</span>
           </div>
@@ -98,13 +100,13 @@ export const Home = () => {
             className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
           >
             <AnimatePresence mode="popLayout">
-              {movies.map((movie) => (
+              {movies && movies.map((movie) => (
                 <motion.div
                   key={movie.id}
                   layout
-                  initial={{ opacity: 0, transform: 'scale(0.9)' }}
-                  animate={{ opacity: 1, transform: 'scale(1)' }}
-                  exit={{ opacity: 0, transform: 'scale(0.9)' }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.2 }}
                 >
                   <MovieCard movie={movie} />
@@ -115,8 +117,8 @@ export const Home = () => {
         )}
 
         {/* Hech narsa topilmaganda */}
-        {!loading && movies.length === 0 && (
-          <div className="text-center py-20 text-muted">
+        {!loading && (!movies || movies.length === 0) && (
+          <div className="text-center py-20 text-gray-4xl">
             <p className="text-lg font-medium">Afsuski, hech qanday film topilmadi 🎬</p>
             <p className="text-sm mt-1">Boshqa kalit so'zlardan foydalanib ko'ring.</p>
           </div>

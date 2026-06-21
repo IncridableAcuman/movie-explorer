@@ -32,7 +32,7 @@ export const MovieCard = ({ movie }: MovieCardProps) => {
         {/* Rasm qismi */}
         <div className="relative aspect-2/3 overflow-hidden bg-gray-950">
           <img
-            src={`https://image.tmdb.org/t/p/w500${movie.posterPath}`}
+            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
             alt={movie.title}
             className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
             loading="lazy"
@@ -50,7 +50,7 @@ export const MovieCard = ({ movie }: MovieCardProps) => {
           {/* Reyting */}
           <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-background/80 backdrop-blur-md px-2.5 py-1 rounded-lg border border-gray-750">
             <Star size={14} className="text-accent fill-accent" />
-            <span className="text-xs font-bold text-white">{movie.voteAverage.toFixed(1)}</span>
+            <span className="text-xs font-bold text-white">{movie.voteAverage}</span>
           </div>
         </div>
 

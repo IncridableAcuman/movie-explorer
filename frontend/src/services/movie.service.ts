@@ -1,5 +1,6 @@
 import axiosInstance from '../api/api';
 import type { Movie, MovieDetails } from '../types';
+import type { MovieVideo } from '../types/video';
 
 export const MovieService = {
   // 1. Backenddan toifalar bo'yicha kinolarni olish (Masalan: popular, trending, top_rated)
@@ -27,7 +28,7 @@ export const MovieService = {
   },
 
   // 4. Filmning treyleri yoki videosini olish (Backendda borligi uchun qo'shib qo'ydik)
-  getVideo: async (id: string | number): Promise<any> => {
+  getVideo: async (id: string | number): Promise<MovieVideo> => {
     const { data } = await axiosInstance.get(`/movies/video/${id}`);
     return data.movies;
   }

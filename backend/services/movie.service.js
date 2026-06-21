@@ -1,6 +1,7 @@
 const BaseError = require("../errors/base.error");
 const MovieResponse = require("../dto/movie.dto");
 const MovieDetailsResponse = require("../dto/movieDetails.dto")
+const MovieVideoDto = require("../dto/movieVideo.dto");
 const API_URL = process.env.API_URL;
 const API_KEY = process.env.API_KEY;
 const axios = require("axios");
@@ -26,7 +27,7 @@ class MovieService {
 
     async getVideo(id) {
         const { data } = await axios.get(`${API_URL}/movie/${id}/videos?language=en-US&api_key=${API_KEY}`);
-        return data;
+        return new MovieVideoDto(data);
     }
 }
 module.exports = new MovieService();
