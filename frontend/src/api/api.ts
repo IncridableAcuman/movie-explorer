@@ -2,7 +2,7 @@ import axios, { type AxiosInstance, AxiosError, type AxiosResponse, type Interna
 
 const axiosInstance: AxiosInstance = axios.create({
   withCredentials: true,
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: "https://movie-explorer-server-3puf.onrender.com/api/v1",
   timeout: 10000,
 });
 
