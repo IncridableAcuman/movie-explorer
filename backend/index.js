@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const db = require("./config/db.config");
+const authMiddleware = require("./middlewares/auth.middleware");
 const errorMiddleware = require("./middlewares/error.middleware");
 const cookieParser = require('cookie-parser');
 const authRoute = require("./routes/auth.route");
@@ -17,7 +18,7 @@ app.use(cors({
 app.use(cookieParser({}));
 
 app.use("/api/v1/auth", authRoute);
-app.use("/api/v1/movies", movieRoute);
+app.use("/api/v1/movies",authMiddleware, movieRoute);
 
 app.use(errorMiddleware)
 

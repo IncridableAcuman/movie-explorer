@@ -19,16 +19,16 @@ class MovieController {
             next(error);
         }
     }
-    async movieDetails(req,res,next){
+    async getVideo(req,res,next){
         try {
             const {id}=req.params;
-            const movies = await movieService.getMovies(id);
+            const movies = await movieService.getVideo(id);
             return res.status(200).json({success:true, movies});
         } catch (error) {
             next(error);
         }
     }
-    async movieDetails(req,res,next){
+    async searchMovie(req,res,next){
         try {
             const {query}=req.query;
             const movies = await movieService.searchMovie(query);
